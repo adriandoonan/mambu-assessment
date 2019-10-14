@@ -1,0 +1,4 @@
+baseURL =  "/"
+languageCode = "en-us"
+title = "Mambu Tech Writer Assessment"
+theme = "hugo-theme-learn"
