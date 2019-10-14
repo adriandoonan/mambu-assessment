@@ -29,18 +29,18 @@ A Card Token Reference is used to identify a Credit or Debit card without needin
 ## Authorization Hold Flow
 
 
-When paying with a credit or debit card there can often be a delay between the intitiation of a payment and transaction being verified or cancelled. In such cases, the common banking industry practice is to issue an **Authorization Hold** which will block this amount from the client's account, ensuring that the full amount is available when the transaction is verified and settled. Another common example is when a hold is made for a deposit when renting a car or hotel room which will be lifted if no incidental charges are incurred during the rental period. This is also sometimes referred to as a 'pre-authorisation'.
+When paying with a credit or debit card there can often be a delay between the intitiation of a payment and transaction being verified or cancelled. In such cases, the common banking industry practice is to issue an [**Authorization Hold**](https://en.wikipedia.org/wiki/Authorization_hold) which will block this amount from the client's account, ensuring that the full amount is available when the transaction is verified and settled. Another common example is when a hold is made for a deposit when renting a car or hotel room which will be lifted if no incidental charges are incurred during the rental period. This is also sometimes referred to as a 'pre-authorisation'.
 
 Industry best practices suggest that Authorization Holds should automatically expire if no action is taken after no more than 7 days for debit card transactions and no more than 30 days for credit card transactions.
 
 ### Authorization Requests
 
 
-An Authorization Request is used to specify the amount to be held and can contain optional information on the merchant. If not otherwise specified the amount will always be in the base currency of the account.
+An [Authorization Request](https://api.mambu.com/#createauthorizationhold) is used to specify the amount to be held and can contain optional information on the merchant. If not otherwise specified the amount will always be in the base currency of the account.
 
-Successful requests will return a reference ID and will be created with the statu "PENDING".
+Successful requests will return a reference ID and will be created with the status **PENDING**.
 
-Requests can fail for a number of reasons such as the client is inactive or blacklisted, or the account does not have sufficient available balance (see below for more information and example calculations).
+Requests can fail for a number of reasons such as the client is inactive or blacklisted, or the account does not have sufficient available balance ([see below](http://localhost:1313/#hold-balance-vs-locked-balance) for more information and example calculations).
 
 ### Retrieving Authorization Holds
 
@@ -50,14 +50,14 @@ API requests can be used to retrieve either an array of [all Authorization Holds
 ### Impact on Account Balance
 
 
-An Authorization Request is made to specify an amount awaiting authorization. This amount will be reflected in the cardholder's available balance and will be unavailable to the cardholder until the merchant either settles or voids the transaction, or the hold expires (see [below](/#expiration-of-authorization-holds)).
+An Authorization Request specifies an amount already earmarked for an upcoming or currently being processed transaction. This amount will therefore be unavailable to the cardholder until the merchant either settles or voids the transaction, or the hold simply expires ([see below](/#expiration-of-authorization-holds)).
 
-An account can have multiple pending Authorization Requests making a total Holds Balance which is used for calculating the Available Balance for an end user.
+An account can have multiple pending Authorization Requests making a total **Holds Balance** which is used for calculating the [Available Balance](https://support.mambu.com/docs/working-with-deposit-accounts#account-overview-details) for an end user.
 
 ### Hold Balance vs Locked Balance
 
 
-When account holders use their balance as a guarantee for a loan, a portion of it can be locked, essentially making it unavailable for use. This will also affect the success or failure of Authorization Hold Requests.
+When account holders use their current account balance as a guarantee for a loan, a portion of it can be locked, essentially making it unavailable for use. This will also affect the success or failure of Authorization Hold Requests.
 
 Consider the following example:
 For a deposit account with current data:
@@ -107,20 +107,22 @@ You can reverse an Authorization Hold either fully or partially using the [decre
 
 A fully reversed Authorization Hold will receive the status **REVERSED** and will no longer affect the cardholder's available balance.
 
-Partially reversed Authorization Hold's will retain the **PENDING** status and its expiry period will be reset, effectively restarting it from the point at which the partial reversal was made.
+Partially reversed Authorization Holds will retain the **PENDING** status and its expiry period will be reset, effectively restarting it from the point at which the partial reversal was made.
 
 **Example:**
 
 - Hold amount = 100 -> Decrease = 75 -> New Hold amount = 25.
 
-
+{{%notice info %}}
+You can also fully reverse a **PENDING** Authorization Hold by making a [**DELETE**](https://api.mambu.com/#reverseauthorizationhold) request
+{{% /notice %}}
 
 ### Settling Authorization Holds
 
 
 Notification to settle an Authorization Hold and create an actual transaction will come as Financial Advice from a card acquirer. Usually this Advice will be to debit the full amount of a previously requested Authorization Hold from a cardholder's account. It is possible, however, that the Advice will be for more or less than the amount under Hold, or that it comes without any prior Authorization Hold having been made at all.
 
-Debits will be recorded with the transaction domain code 'Payments', family code 'Merchant Card Transactions' and sub-family code 'Credit Card Payment'.
+Debits will be recorded with the transaction domain code '_**Payments**_', family code '_**Merchant Card Transactions**_' and sub-family code '_**Credit Card Payment**_'.
 
 Once the transaction has been completed the Authorization Hold will be updated to include the transaction ID and have its status set to **SETTLED**.
 
@@ -147,9 +149,13 @@ These transactions are made using the same API request as a standard Authorizati
 
 
 
-### Financial Requests
+### Financial Transaction Requests
 
 
-For transactions such as ATM withdrawls or PIN Debits, which are not routed via a credit card processing network, Financial Requests are used to authorize an amount and immediately debit the cardholder's account with a single request.
+For transactions such as ATM withdrawls or PIN Debits, which are not routed via a credit card processing network, [Financial Requests](https://api.mambu.com/#createcardtransaction) are used to authorize an amount and immediately debit the cardholder's account with a single request.
 
 Financial Requests can only be made in the base currency of an account given that it has sufficient Available Balance and is active and not currently blocked.
+
+{{% notice info %}}
+ATM withdrawls can also be reversed using the [dedicated API request](https://api.mambu.com/#reversecardwithdrawaltransaction)
+{{% notice info %}}

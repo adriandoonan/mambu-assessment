@@ -12,18 +12,18 @@
     <title>Card Payments and Authorization Holds :: Mambu Tech Writer Assessment</title>
 
     
-    <link href="/css/nucleus.css?1571043743" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1571043743" rel="stylesheet">
-    <link href="/css/hybrid.css?1571043743" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1571043743" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1571043743" rel="stylesheet">
-    <link href="/css/auto-complete.css?1571043743" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1571043743" rel="stylesheet">
-    <link href="/css/theme.css?1571043743" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1571043743" rel="stylesheet">
+    <link href="/css/nucleus.css?1571049189" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1571049189" rel="stylesheet">
+    <link href="/css/hybrid.css?1571049189" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1571049189" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1571049189" rel="stylesheet">
+    <link href="/css/auto-complete.css?1571049189" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1571049189" rel="stylesheet">
+    <link href="/css/theme.css?1571049189" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1571049189" rel="stylesheet">
     
 
-    <script src="/js/jquery-3.3.1.min.js?1571043743"></script>
+    <script src="/js/jquery-3.3.1.min.js?1571049189"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -50,14 +50,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1571043743"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1571043743"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1571049189"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1571049189"></script>
 <script type="text/javascript">
     
         var baseurl = "\/";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1571043743"></script>
+<script type="text/javascript" src="/js/search.js?1571049189"></script>
 
     
   </div>
@@ -130,17 +130,17 @@
 
 <h2 id="authorization-hold-flow">Authorization Hold Flow</h2>
 
-<p>When paying with a credit or debit card there can often be a delay between the intitiation of a payment and transaction being verified or cancelled. In such cases, the common banking industry practice is to issue an <strong>Authorization Hold</strong> which will block this amount from the client&rsquo;s account, ensuring that the full amount is available when the transaction is verified and settled. Another common example is when a hold is made for a deposit when renting a car or hotel room which will be lifted if no incidental charges are incurred during the rental period. This is also sometimes referred to as a &lsquo;pre-authorisation&rsquo;.</p>
+<p>When paying with a credit or debit card there can often be a delay between the intitiation of a payment and transaction being verified or cancelled. In such cases, the common banking industry practice is to issue an <a href="https://en.wikipedia.org/wiki/Authorization_hold"><strong>Authorization Hold</strong></a> which will block this amount from the client&rsquo;s account, ensuring that the full amount is available when the transaction is verified and settled. Another common example is when a hold is made for a deposit when renting a car or hotel room which will be lifted if no incidental charges are incurred during the rental period. This is also sometimes referred to as a &lsquo;pre-authorisation&rsquo;.</p>
 
 <p>Industry best practices suggest that Authorization Holds should automatically expire if no action is taken after no more than 7 days for debit card transactions and no more than 30 days for credit card transactions.</p>
 
 <h3 id="authorization-requests">Authorization Requests</h3>
 
-<p>An Authorization Request is used to specify the amount to be held and can contain optional information on the merchant. If not otherwise specified the amount will always be in the base currency of the account.</p>
+<p>An <a href="https://api.mambu.com/#createauthorizationhold">Authorization Request</a> is used to specify the amount to be held and can contain optional information on the merchant. If not otherwise specified the amount will always be in the base currency of the account.</p>
 
-<p>Successful requests will return a reference ID and will be created with the statu &ldquo;PENDING&rdquo;.</p>
+<p>Successful requests will return a reference ID and will be created with the status <strong>PENDING</strong>.</p>
 
-<p>Requests can fail for a number of reasons such as the client is inactive or blacklisted, or the account does not have sufficient available balance (see below for more information and example calculations).</p>
+<p>Requests can fail for a number of reasons such as the client is inactive or blacklisted, or the account does not have sufficient available balance (<a href="http://localhost:1313/#hold-balance-vs-locked-balance">see below</a> for more information and example calculations).</p>
 
 <h3 id="retrieving-authorization-holds">Retrieving Authorization Holds</h3>
 
@@ -148,13 +148,13 @@
 
 <h3 id="impact-on-account-balance">Impact on Account Balance</h3>
 
-<p>An Authorization Request is made to specify an amount awaiting authorization. This amount will be reflected in the cardholder&rsquo;s available balance and will be unavailable to the cardholder until the merchant either settles or voids the transaction, or the hold expires (see <a href="/#expiration-of-authorization-holds">below</a>).</p>
+<p>An Authorization Request specifies an amount already earmarked for an upcoming or currently being processed transaction. This amount will therefore be unavailable to the cardholder until the merchant either settles or voids the transaction, or the hold simply expires (<a href="/#expiration-of-authorization-holds">see below</a>).</p>
 
-<p>An account can have multiple pending Authorization Requests making a total Holds Balance which is used for calculating the Available Balance for an end user.</p>
+<p>An account can have multiple pending Authorization Requests making a total <strong>Holds Balance</strong> which is used for calculating the <a href="https://support.mambu.com/docs/working-with-deposit-accounts#account-overview-details">Available Balance</a> for an end user.</p>
 
 <h3 id="hold-balance-vs-locked-balance">Hold Balance vs Locked Balance</h3>
 
-<p>When account holders use their balance as a guarantee for a loan, a portion of it can be locked, essentially making it unavailable for use. This will also affect the success or failure of Authorization Hold Requests.</p>
+<p>When account holders use their current account balance as a guarantee for a loan, a portion of it can be locked, essentially making it unavailable for use. This will also affect the success or failure of Authorization Hold Requests.</p>
 
 <p>Consider the following example:
 For a deposit account with current data:</p>
@@ -234,7 +234,7 @@ For a deposit account with current data:</p>
 
 <p>A fully reversed Authorization Hold will receive the status <strong>REVERSED</strong> and will no longer affect the cardholder&rsquo;s available balance.</p>
 
-<p>Partially reversed Authorization Hold&rsquo;s will retain the <strong>PENDING</strong> status and its expiry period will be reset, effectively restarting it from the point at which the partial reversal was made.</p>
+<p>Partially reversed Authorization Holds will retain the <strong>PENDING</strong> status and its expiry period will be reset, effectively restarting it from the point at which the partial reversal was made.</p>
 
 <p><strong>Example:</strong></p>
 
@@ -242,11 +242,16 @@ For a deposit account with current data:</p>
 <li>Hold amount = 100 -&gt; Decrease = 75 -&gt; New Hold amount = 25.</li>
 </ul>
 
+
+<div class="notices info" ><p>You can also fully reverse a <strong>PENDING</strong> Authorization Hold by making a <a href="https://api.mambu.com/#reverseauthorizationhold"><strong>DELETE</strong></a> request</p>
+</div>
+
+
 <h3 id="settling-authorization-holds">Settling Authorization Holds</h3>
 
 <p>Notification to settle an Authorization Hold and create an actual transaction will come as Financial Advice from a card acquirer. Usually this Advice will be to debit the full amount of a previously requested Authorization Hold from a cardholder&rsquo;s account. It is possible, however, that the Advice will be for more or less than the amount under Hold, or that it comes without any prior Authorization Hold having been made at all.</p>
 
-<p>Debits will be recorded with the transaction domain code &lsquo;Payments&rsquo;, family code &lsquo;Merchant Card Transactions&rsquo; and sub-family code &lsquo;Credit Card Payment&rsquo;.</p>
+<p>Debits will be recorded with the transaction domain code &lsquo;<em><strong>Payments</strong></em>&rsquo;, family code &lsquo;<em><strong>Merchant Card Transactions</strong></em>&rsquo; and sub-family code &lsquo;<em><strong>Credit Card Payment</strong></em>&rsquo;.</p>
 
 <p>Once the transaction has been completed the Authorization Hold will be updated to include the transaction ID and have its status set to <strong>SETTLED</strong>.</p>
 
@@ -264,11 +269,18 @@ For a deposit account with current data:</p>
 
 <p>These transactions are made using the same API request as a standard Authorization Hold but with the <strong>advice</strong> flag set to true. This will cause the request to be made without validation and as a result can both  allow a cardholder to make a transaction for an amount over any <a href="https://support.mambu.com/docs/setting-up-new-deposit-products#deposits-and-withdrawals">defined limits</a>, as well as allow for usage without the normal balance checks, causing an account to go into <a href="https://support.mambu.com/docs/technical-overdraft/">Technical Overdraft</a>.</p>
 
-<h3 id="financial-requests">Financial Requests</h3>
+<h3 id="financial-transaction-requests">Financial Transaction Requests</h3>
 
-<p>For transactions such as ATM withdrawls or PIN Debits, which are not routed via a credit card processing network, Financial Requests are used to authorize an amount and immediately debit the cardholder&rsquo;s account with a single request.</p>
+<p>For transactions such as ATM withdrawls or PIN Debits, which are not routed via a credit card processing network, <a href="https://api.mambu.com/#createcardtransaction">Financial Requests</a> are used to authorize an amount and immediately debit the cardholder&rsquo;s account with a single request.</p>
 
 <p>Financial Requests can only be made in the base currency of an account given that it has sufficient Available Balance and is active and not currently blocked.</p>
+
+
+<div class="notices info" ><p>ATM withdrawls can also be reversed using the <a href="https://api.mambu.com/#reversecardwithdrawaltransaction">dedicated API request</a></p>
+
+<div class="notices info" ></div>
+</div>
+
 	
   
         
@@ -315,19 +327,19 @@ For a deposit account with current data:</p>
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1571043743"></script>
-    <script src="/js/perfect-scrollbar.min.js?1571043743"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1571043743"></script>
-    <script src="/js/jquery.sticky.js?1571043743"></script>
-    <script src="/js/featherlight.min.js?1571043743"></script>
-    <script src="/js/highlight.pack.js?1571043743"></script>
+    <script src="/js/clipboard.min.js?1571049189"></script>
+    <script src="/js/perfect-scrollbar.min.js?1571049189"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1571049189"></script>
+    <script src="/js/jquery.sticky.js?1571049189"></script>
+    <script src="/js/featherlight.min.js?1571049189"></script>
+    <script src="/js/highlight.pack.js?1571049189"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1571043743"></script>
-    <script src="/js/learn.js?1571043743"></script>
-    <script src="/js/hugo-learn.js?1571043743"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1571049189"></script>
+    <script src="/js/learn.js?1571049189"></script>
+    <script src="/js/hugo-learn.js?1571049189"></script>
 
-    <link href="/mermaid/mermaid.css?1571043743" rel="stylesheet" />
-    <script src="/mermaid/mermaid.js?1571043743"></script>
+    <link href="/mermaid/mermaid.css?1571049189" rel="stylesheet" />
+    <script src="/mermaid/mermaid.js?1571049189"></script>
     <script>
         mermaid.initialize({ startOnLoad: true });
     </script>
