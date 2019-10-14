@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en" class="js csstransforms3d">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Hugo 0.58.3" />
+    <meta name="description" content="">
+
+
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+
+    <title>Card Payments and Authorization Holds :: Mambu Tech Writer Assessment</title>
+
+    
+    <link href="/css/nucleus.css?1571043743" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1571043743" rel="stylesheet">
+    <link href="/css/hybrid.css?1571043743" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1571043743" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1571043743" rel="stylesheet">
+    <link href="/css/auto-complete.css?1571043743" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1571043743" rel="stylesheet">
+    <link href="/css/theme.css?1571043743" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1571043743" rel="stylesheet">
+    
+
+    <script src="/js/jquery-3.3.1.min.js?1571043743"></script>
+
+    <style>
+      :root #header + #content > #left > #rlblock_left{
+          display:none !important;
+      }
+      
+    </style>
+    
+  </head>
+  <body class="" data-url="/">
+    <nav id="sidebar" class="">
+
+
+
+  <div id="header-wrapper">
+    <div id="header">
+      <img id="logo" src="/images/mambu-logo.jpg" href="/">
+
+    </div>
+    
+        <div class="searchbox">
+    <label for="search-by"><i class="fas fa-search"></i></label>
+    <input data-search-input id="search-by" type="search" placeholder="Search...">
+    <span data-search-clear=""><i class="fas fa-times"></i></span>
+</div>
+
+<script type="text/javascript" src="/js/lunr.min.js?1571043743"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1571043743"></script>
+<script type="text/javascript">
+    
+        var baseurl = "\/";
+    
+</script>
+<script type="text/javascript" src="/js/search.js?1571043743"></script>
+
+    
+  </div>
+
+    <div class="highlightable">
+    <ul class="topics">
+
+        
+          
+         
+    </ul>
+
+    
+    
+
+    
+    <section id="footer">
+      <p>Built with <a href="https://github.com/matcornic/hugo-theme-learn"><i class="fas fa-heart"></i></a> from <a href="https://getgrav.org">Grav</a> and <a href="https://gohugo.io/">Hugo</a></p>
+
+    </section>
+  </div>
+</nav>
+
+
+
+
+
+        <section id="body">
+        <div id="overlay"></div>
+        <div class="padding highlightable">
+              
+        <div id="head-tags">
+        
+        </div>
+        
+        <div id="body-inner">
+          
+
+        
+
+
+<span id="sidebar-toggle-span">
+<a href="#" id="sidebar-toggle" data-sidebar-toggle=""><i class="fas fa-bars"></i> navigation</a>
+</span>
+
+ 
+
+
+<h1 id="card-payments-and-authorization-holds">Card Payments and Authorization Holds</h1>
+
+<h2 id="overview">Overview</h2>
+
+<p>Most end users today expect to be able to function in a fully cashless way, using debit and credit cards to make and recevive payments as well as make direct withdrawals from debit accounts and cash advances against credit.</p>
+
+<p>Mambu fully supports industry standard Authorization Hold flows for card payments and allows you to request, adjust, reverse and settle holds against Current Account type deposit products.</p>
+
+<h3 id="requirements">Requirements</h3>
+
+<ul>
+<li>You must be using API 2.0</li>
+<li>The account against which you wish to make an Authorization Hold request must be of the type &ldquo;Current Account&rdquo;</li>
+<li>&ldquo;Cards&rdquo; functionality must be enable for your instance</li>
+<li>There must be a Card Token Reference associated with the account</li>
+</ul>
+
+
+<div class="notices info" ><p>A Card Token Reference is used to identify a Credit or Debit card without needing to always provide sensitive information such as the card number and, as such, is a shared reference between your instance and your card issuer&rsquo;s system</p>
+</div>
+
+
+<h2 id="authorization-hold-flow">Authorization Hold Flow</h2>
+
+<p>When paying with a credit or debit card there can often be a delay between the intitiation of a payment and transaction being verified or cancelled. In such cases, the common banking industry practice is to issue an <strong>Authorization Hold</strong> which will block this amount from the client&rsquo;s account, ensuring that the full amount is available when the transaction is verified and settled. Another common example is when a hold is made for a deposit when renting a car or hotel room which will be lifted if no incidental charges are incurred during the rental period. This is also sometimes referred to as a &lsquo;pre-authorisation&rsquo;.</p>
+
+<p>Industry best practices suggest that Authorization Holds should automatically expire if no action is taken after no more than 7 days for debit card transactions and no more than 30 days for credit card transactions.</p>
+
+<h3 id="authorization-requests">Authorization Requests</h3>
+
+<p>An Authorization Request is used to specify the amount to be held and can contain optional information on the merchant. If not otherwise specified the amount will always be in the base currency of the account.</p>
+
+<p>Successful requests will return a reference ID and will be created with the statu &ldquo;PENDING&rdquo;.</p>
+
+<p>Requests can fail for a number of reasons such as the client is inactive or blacklisted, or the account does not have sufficient available balance (see below for more information and example calculations).</p>
+
+<h3 id="retrieving-authorization-holds">Retrieving Authorization Holds</h3>
+
+<p>API requests can be used to retrieve either an array of <a href="https://api.mambu.com/#depositaccounts-getallauthorizationholds">all Authorization Holds</a> for a given deposit account or <a href="https://api.mambu.com/#getauthorizationholdbyid">details on a specific Hold</a> on a given card by its ID.</p>
+
+<h3 id="impact-on-account-balance">Impact on Account Balance</h3>
+
+<p>An Authorization Request is made to specify an amount awaiting authorization. This amount will be reflected in the cardholder&rsquo;s available balance and will be unavailable to the cardholder until the merchant either settles or voids the transaction, or the hold expires (see <a href="/#expiration-of-authorization-holds">below</a>).</p>
+
+<p>An account can have multiple pending Authorization Requests making a total Holds Balance which is used for calculating the Available Balance for an end user.</p>
+
+<h3 id="hold-balance-vs-locked-balance">Hold Balance vs Locked Balance</h3>
+
+<p>When account holders use their balance as a guarantee for a loan, a portion of it can be locked, essentially making it unavailable for use. This will also affect the success or failure of Authorization Hold Requests.</p>
+
+<p>Consider the following example:
+For a deposit account with current data:</p>
+
+<ul>
+<li>Booked Balance of 1000</li>
+<li>Overdraft limit of 1500(see note)</li>
+<li>Locked Balance of 500</li>
+
+<li><p>Holds Balance of 100</p>
+
+<ul>
+<li>-&gt; available balance = 400 (<a href="https://support.mambu.com/docs/working-with-deposit-accounts">see here</a> for more details)</li>
+</ul></li>
+</ul>
+
+<table>
+<thead>
+<tr>
+<th>Hold Amount Request</th>
+<th>Authorization Request Response</th>
+<th>Holds Balance</th>
+<th>Available Balance</th>
+<th>Notes</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>100</td>
+<td>success</td>
+<td>200</td>
+<td>300</td>
+<td>The overdraft limit is not taken into consideration when there is a positive locked balance (the account acts like it has overdraft disabled).</td>
+</tr>
+
+<tr>
+<td>400</td>
+<td>success</td>
+<td>500</td>
+<td>0</td>
+<td>The hold request is successful as it reaches but does not exceeed the Available Balance of the account</td>
+</tr>
+
+<tr>
+<td>401</td>
+<td>fail</td>
+<td>100</td>
+<td>400</td>
+<td>Despite the overdraft limit, the hold request fails since the booked balance may become lower than the amount under lock.</td>
+</tr>
+</tbody>
+</table>
+
+
+<div class="notices note" ><p>As a loan can not be used as a guarantee for another loan, when an account has a Locked Balance, it acts as if the overdraft facility has been disabled. This means that the overdraft limit is no longer taken into account for the calculation of the Available Balance</p>
+</div>
+
+
+<h3 id="expiration-of-authorization-holds">Expiration of Authorization Holds</h3>
+
+<p>By default Authorization Holds will expire after a period of 7 days although this can be changed to reflect your bank&rsquo;s policies using the Administration Panel. You can also set different expiry periods for specific Merchant Categories, in which case, this period will be used for Holds requested for this Merchant Category Code.</p>
+
+<p>Every hour, a scheduled job will run to automatically cancel any Authorization Hold Requests on which no action has been taken before the expiration you have set.</p>
+
+<p>When a hold has expired its status will change to <strong>EXPIRED</strong> and the hold amount will no longer influence the end user&rsquo;s available balance.</p>
+
+<h3 id="adjusting-authorization-holds">Adjusting Authorization Holds</h3>
+
+<p>Authorization Holds with a <strong>PENDING</strong> status can be <a href="https://api.mambu.com/#increaseauthorizationhold">increased</a> or <a href="https://api.mambu.com/#decreaseauthorizationhold">decreased</a> by making an API request and supplying the Card Token Reference and Authorization Hold Request ID along with the amount with which to increase or decrease the held amount.</p>
+
+<p>A decrease of the same or more than the full amount of the hold will effectively reverse the hold (see below).</p>
+
+<h3 id="reversing-authorization-holds">Reversing Authorization Holds</h3>
+
+<p>You can reverse an Authorization Hold either fully or partially using the <a href="https://api.mambu.com/#decreaseauthorizationhold">decrease</a> endpoint either if the transaction is aborted or the cardholder will be charged a lesser amount.</p>
+
+<p>A fully reversed Authorization Hold will receive the status <strong>REVERSED</strong> and will no longer affect the cardholder&rsquo;s available balance.</p>
+
+<p>Partially reversed Authorization Hold&rsquo;s will retain the <strong>PENDING</strong> status and its expiry period will be reset, effectively restarting it from the point at which the partial reversal was made.</p>
+
+<p><strong>Example:</strong></p>
+
+<ul>
+<li>Hold amount = 100 -&gt; Decrease = 75 -&gt; New Hold amount = 25.</li>
+</ul>
+
+<h3 id="settling-authorization-holds">Settling Authorization Holds</h3>
+
+<p>Notification to settle an Authorization Hold and create an actual transaction will come as Financial Advice from a card acquirer. Usually this Advice will be to debit the full amount of a previously requested Authorization Hold from a cardholder&rsquo;s account. It is possible, however, that the Advice will be for more or less than the amount under Hold, or that it comes without any prior Authorization Hold having been made at all.</p>
+
+<p>Debits will be recorded with the transaction domain code &lsquo;Payments&rsquo;, family code &lsquo;Merchant Card Transactions&rsquo; and sub-family code &lsquo;Credit Card Payment&rsquo;.</p>
+
+<p>Once the transaction has been completed the Authorization Hold will be updated to include the transaction ID and have its status set to <strong>SETTLED</strong>.</p>
+
+<h3 id="refunding-previously-settled-authorization-holds">Refunding Previously Settled Authorization Holds</h3>
+
+<p>Once an Authorization Hold has been settled and monies already debited from a cardholder&rsquo;s account it can no longer be reversed and must be refunded by way of a new transaction for the full amount charged or, in the case of a partial refund, less than the originally charged amount.</p>
+
+<p>Any interest applied before the refund has been made will not be affected and should be considered seperately.</p>
+
+<h2 id="other-card-payment-operations">Other Card Payment Operations</h2>
+
+<h3 id="offline-transactions">Offline Transactions</h3>
+
+<p>In cetain situations transactions may be made without the possibility to communicate with a card issuer&rsquo;s system. For example, a system with no internet connectivity, such as an airplane while in flight or when transactions are processed in a batch at a set time period like the end of a business day. Such transactions are commonly known as <strong>Offline Transactions</strong>.</p>
+
+<p>These transactions are made using the same API request as a standard Authorization Hold but with the <strong>advice</strong> flag set to true. This will cause the request to be made without validation and as a result can both  allow a cardholder to make a transaction for an amount over any <a href="https://support.mambu.com/docs/setting-up-new-deposit-products#deposits-and-withdrawals">defined limits</a>, as well as allow for usage without the normal balance checks, causing an account to go into <a href="https://support.mambu.com/docs/technical-overdraft/">Technical Overdraft</a>.</p>
+
+<h3 id="financial-requests">Financial Requests</h3>
+
+<p>For transactions such as ATM withdrawls or PIN Debits, which are not routed via a credit card processing network, Financial Requests are used to authorize an amount and immediately debit the cardholder&rsquo;s account with a single request.</p>
+
+<p>Financial Requests can only be made in the base currency of an account given that it has sufficient Available Balance and is active and not currently blocked.</p>
+	
+  
+        
+        </div> 
+        
+
+      </div>
+
+    <div id="navigation">
+        
+        
+        
+        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+            
+        
+        
+        
+
+
+	 
+	 
+		
+		
+	
+    </div>
+
+    </section>
+    
+    <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
+      <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
+    </div>
+    <script src="/js/clipboard.min.js?1571043743"></script>
+    <script src="/js/perfect-scrollbar.min.js?1571043743"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1571043743"></script>
+    <script src="/js/jquery.sticky.js?1571043743"></script>
+    <script src="/js/featherlight.min.js?1571043743"></script>
+    <script src="/js/highlight.pack.js?1571043743"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="/js/modernizr.custom-3.6.0.js?1571043743"></script>
+    <script src="/js/learn.js?1571043743"></script>
+    <script src="/js/hugo-learn.js?1571043743"></script>
+
+    <link href="/mermaid/mermaid.css?1571043743" rel="stylesheet" />
+    <script src="/mermaid/mermaid.js?1571043743"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+    
+
+  </body>
+</html>
+
